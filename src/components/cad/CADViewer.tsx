@@ -1,8 +1,9 @@
 import { Suspense, useRef, useState, useEffect } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, PerspectiveCamera, Grid, Environment } from "@react-three/drei";
-import { Mesh } from "three";
+import { Mesh, BufferGeometry, Float32BufferAttribute, BufferAttribute, Group } from "three";
 import { Loader } from "lucide-react";
+import { rhinoService, RhinoObject } from "@/services/rhinoCompute";
 
 interface CADViewerProps {
   file: File;
@@ -14,46 +15,52 @@ interface CADViewerProps {
   onControlsChange: (controls: any) => void;
 }
 
-// Actual 3DM file model component
+// Rhino 3DM model component using actual file parsing
 const RhinoModel = ({ file }: { file: File }) => {
-  const [modelData, setModelData] = useState<any>(null);
+  const [rhinoObjects, setRhinoObjects] = useState<RhinoObject[]>([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const meshRef = useRef<Mesh>(null);
+  const groupRef = useRef<Group>(null);
 
   useFrame((state, delta) => {
-    if (meshRef.current) {
-      meshRef.current.rotation.y += delta * 0.2;
+    if (groupRef.current) {
+      groupRef.current.rotation.y += delta * 0.1;
     }
   });
 
-  // Parse the 3DM file
+  // Parse the actual 3DM file using rhino3dm
   useEffect(() => {
     const parseRhinoFile = async () => {
       try {
-        // For now, create a representation based on file properties
-        // In a real implementation, you'd use rhino3dm.js or similar
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          // This is a simplified representation
-          // Real 3DM parsing would require rhino3dm.js library
-          setModelData({
-            fileName: file.name,
-            fileSize: file.size,
-            type: '3dm',
-            parsed: true
-          });
-        };
-        reader.onerror = () => {
-          setError('Failed to read file');
-        };
-        reader.readAsArrayBuffer(file);
+        setLoading(true);
+        setError(null);
+        
+        console.log('Parsing 3DM file:', file.name);
+        const objects = await rhinoService.parse3dmFile(file);
+        
+        console.log('Parsed objects:', objects.length);
+        setRhinoObjects(objects);
       } catch (err) {
-        setError('Error parsing 3DM file');
+        console.error('Error parsing 3DM file:', err);
+        setError(err instanceof Error ? err.message : 'Failed to parse 3DM file');
+      } finally {
+        setLoading(false);
       }
     };
 
     parseRhinoFile();
   }, [file]);
+
+  if (loading) {
+    return (
+      <group>
+        <mesh position={[0, 0, 0]}>
+          <boxGeometry args={[2, 0.1, 2]} />
+          <meshStandardMaterial color="#888888" wireframe />
+        </mesh>
+      </group>
+    );
+  }
 
   if (error) {
     return (
@@ -66,7 +73,7 @@ const RhinoModel = ({ file }: { file: File }) => {
     );
   }
 
-  if (!modelData) {
+  if (rhinoObjects.length === 0) {
     return (
       <group>
         <mesh position={[0, 0, 0]}>
@@ -77,57 +84,45 @@ const RhinoModel = ({ file }: { file: File }) => {
     );
   }
 
-  // Generate a unique model based on file characteristics
-  const seed = file.name.split('').reduce((a, b) => a + b.charCodeAt(0), 0);
-  const colorHue = (seed % 360) / 360;
-  const complexity = Math.min(Math.floor(file.size / 100000) + 3, 12);
-
   return (
-    <group>
-      {/* Main model representation based on file */}
-      {Array.from({ length: complexity }, (_, i) => {
-        const angle = (i / complexity) * Math.PI * 2;
-        const radius = 2 + Math.sin(seed + i) * 0.5;
-        const height = 1 + Math.cos(seed + i * 2) * 0.5;
+    <group ref={groupRef}>
+      {rhinoObjects.map((rhinoObj, index) => {
+        const geometry = new BufferGeometry();
+        
+        // Convert vertices to flat array
+        const vertices = new Float32Array(rhinoObj.geometry.vertices.flat());
+        geometry.setAttribute('position', new Float32BufferAttribute(vertices, 3));
+        
+        // Add faces (indices)
+        const indices = new Uint16Array(rhinoObj.geometry.faces.flat());
+        geometry.setIndex(new BufferAttribute(indices, 1));
+        
+        // Add normals if available
+        if (rhinoObj.geometry.normals) {
+          const normals = new Float32Array(rhinoObj.geometry.normals.flat());
+          geometry.setAttribute('normal', new Float32BufferAttribute(normals, 3));
+        } else {
+          geometry.computeVertexNormals();
+        }
+        
+        // Add colors if available
+        let materialColor = `hsl(${(index * 137.5) % 360}, 70%, 60%)`;
+        if (rhinoObj.geometry.colors && rhinoObj.geometry.colors.length > 0) {
+          const colors = new Float32Array(rhinoObj.geometry.colors.flat());
+          geometry.setAttribute('color', new Float32BufferAttribute(colors, 4));
+        }
         
         return (
-          <mesh
-            key={i}
-            ref={i === 0 ? meshRef : undefined}
-            position={[
-              Math.cos(angle) * radius,
-              Math.sin(seed + i) * height,
-              Math.sin(angle) * radius
-            ]}
-            rotation={[
-              Math.sin(seed + i) * 0.5,
-              angle,
-              Math.cos(seed + i) * 0.3
-            ]}
-          >
-            <boxGeometry args={[
-              0.5 + Math.abs(Math.sin(seed + i)) * 0.5,
-              0.5 + Math.abs(Math.cos(seed + i)) * 0.5,
-              0.5 + Math.abs(Math.sin(seed + i * 2)) * 0.5
-            ]} />
+          <mesh key={rhinoObj.id} geometry={geometry}>
             <meshStandardMaterial 
-              color={`hsl(${(colorHue + i * 0.1) * 360}, 70%, ${50 + i * 2}%)`}
-              metalness={0.3 + (i % 3) * 0.2}
-              roughness={0.2 + (i % 2) * 0.3}
+              color={materialColor}
+              metalness={0.3}
+              roughness={0.4}
+              vertexColors={rhinoObj.geometry.colors ? true : false}
             />
           </mesh>
         );
       })}
-      
-      {/* Central core */}
-      <mesh position={[0, 0, 0]}>
-        <sphereGeometry args={[0.8]} />
-        <meshStandardMaterial 
-          color={`hsl(${colorHue * 360}, 80%, 60%)`}
-          metalness={0.8}
-          roughness={0.1}
-        />
-      </mesh>
     </group>
   );
 };
