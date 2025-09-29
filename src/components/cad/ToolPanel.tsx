@@ -29,14 +29,14 @@ export const ToolPanel = ({ file, controls, onControlsChange }: ToolPanelProps) 
   const [showGrid, setShowGrid] = useState(true);
   const [showWireframe, setShowWireframe] = useState(false);
   const [layers] = useState([
-    { id: 1, name: 'Géométrie principale', visible: true, color: '#747bff' },
-    { id: 2, name: 'Détails', visible: true, color: '#ff6b6b' },
+    { id: 1, name: 'Main Geometry', visible: true, color: '#747bff' },
+    { id: 2, name: 'Details', visible: true, color: '#ff6b6b' },
     { id: 3, name: 'Annotations', visible: false, color: '#4ecdc4' }
   ]);
 
   const tools = [
-    { id: 'move', icon: Move, label: 'Déplacer' },
-    { id: 'rotate', icon: RotateCw, label: 'Rotation' },
+    { id: 'move', icon: Move, label: 'Move' },
+    { id: 'rotate', icon: RotateCw, label: 'Rotate' },
     { id: 'zoom', icon: ZoomIn, label: 'Zoom' }
   ];
 
@@ -45,15 +45,15 @@ export const ToolPanel = ({ file, controls, onControlsChange }: ToolPanelProps) 
       {/* File Info */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base">Informations du fichier</CardTitle>
+          <CardTitle className="text-base">File Information</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2 text-sm">
           <div className="flex justify-between">
-            <span className="text-gray-600">Nom:</span>
+            <span className="text-gray-600">Name:</span>
             <span className="font-medium">{file.name}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-600">Taille:</span>
+            <span className="text-gray-600">Size:</span>
             <span>{(file.size / 1024 / 1024).toFixed(2)} MB</span>
           </div>
           <div className="flex justify-between">
@@ -66,7 +66,7 @@ export const ToolPanel = ({ file, controls, onControlsChange }: ToolPanelProps) 
       {/* Tools */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base">Outils</CardTitle>
+          <CardTitle className="text-base">Tools</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-3 gap-2">
@@ -89,13 +89,13 @@ export const ToolPanel = ({ file, controls, onControlsChange }: ToolPanelProps) 
       {/* View Controls */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base">Affichage</CardTitle>
+          <CardTitle className="text-base">Display</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <Grid3X3 className="w-4 h-4" />
-              <span className="text-sm">Grille</span>
+              <span className="text-sm">Grid</span>
             </div>
             <Switch checked={showGrid} onCheckedChange={setShowGrid} />
           </div>
@@ -103,7 +103,7 @@ export const ToolPanel = ({ file, controls, onControlsChange }: ToolPanelProps) 
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <Ruler className="w-4 h-4" />
-              <span className="text-sm">Filaire</span>
+              <span className="text-sm">Wireframe</span>
             </div>
             <Switch checked={showWireframe} onCheckedChange={setShowWireframe} />
           </div>
@@ -112,7 +112,7 @@ export const ToolPanel = ({ file, controls, onControlsChange }: ToolPanelProps) 
           
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-sm">Opacité</span>
+              <span className="text-sm">Opacity</span>
               <span className="text-xs text-gray-500">100%</span>
             </div>
             <Slider defaultValue={[100]} max={100} step={1} />
@@ -123,7 +123,7 @@ export const ToolPanel = ({ file, controls, onControlsChange }: ToolPanelProps) 
       {/* Layers */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base">Calques</CardTitle>
+          <CardTitle className="text-base">Layers</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           {layers.map((layer) => (
@@ -153,11 +153,11 @@ export const ToolPanel = ({ file, controls, onControlsChange }: ToolPanelProps) 
       <div className="space-y-2">
         <Button variant="outline" className="w-full">
           <Settings className="w-4 h-4 mr-2" />
-          Paramètres
+          Settings
         </Button>
         <Button variant="outline" className="w-full">
           <Palette className="w-4 h-4 mr-2" />
-          Matériaux
+          Materials
         </Button>
       </div>
     </div>

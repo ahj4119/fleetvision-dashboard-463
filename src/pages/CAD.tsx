@@ -35,17 +35,17 @@ const CAD = () => {
         <div className="p-6 border-b bg-white">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Modélisation 3D</h1>
-              <p className="text-gray-600">Téléchargez et visualisez vos fichiers Rhino 3DM</p>
+              <h1 className="text-2xl font-bold text-gray-900">3D Modeling</h1>
+              <p className="text-gray-600">Upload and visualize your Rhino 3DM files</p>
             </div>
             <div className="flex space-x-2">
               <Button variant="outline" onClick={resetView}>
                 <RotateCcw className="w-4 h-4 mr-2" />
-                Réinitialiser
+                Reset View
               </Button>
               <Button>
                 <Save className="w-4 h-4 mr-2" />
-                Sauvegarder
+                Save
               </Button>
             </div>
           </div>

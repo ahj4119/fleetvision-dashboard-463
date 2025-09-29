@@ -16,24 +16,24 @@ const vehicles: Vehicle[] = [
     plate: "AB-123-CD",
     model: "Tesla Model 3",
     status: "active",
-    driver: "Jean Dupont",
-    lastUpdate: "Il y a 5 min",
+    driver: "John Smith",
+    lastUpdate: "5 min ago",
   },
   {
     id: "2",
     plate: "EF-456-GH",
     model: "Renault Zoe",
     status: "maintenance",
-    driver: "Marie Martin",
-    lastUpdate: "Il y a 2h",
+    driver: "Mary Johnson",
+    lastUpdate: "2h ago",
   },
   {
     id: "3",
     plate: "IJ-789-KL",
     model: "Peugeot e-208",
     status: "issue",
-    driver: "Pierre Durant",
-    lastUpdate: "Il y a 30 min",
+    driver: "Peter Wilson",
+    lastUpdate: "30 min ago",
   },
 ];
 
@@ -47,7 +47,7 @@ export const VehicleList = () => {
   return (
     <div className="bg-white rounded-lg shadow-sm">
       <div className="p-6 border-b border-gray-200">
-        <h2 className="text-lg font-semibold text-gray-900">État des véhicules</h2>
+        <h2 className="text-lg font-semibold text-gray-900">Vehicle Status</h2>
       </div>
       <div className="divide-y divide-gray-200">
         {vehicles.map((vehicle) => {

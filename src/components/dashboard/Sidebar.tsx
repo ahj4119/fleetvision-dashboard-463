@@ -2,13 +2,13 @@ import { Home, Car, Users, Fuel, Wrench, Settings, Box } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const menuItems = [
-  { icon: Home, label: "Vue d'ensemble", path: "/" },
-  { icon: Car, label: "Véhicules", path: "/vehicles" },
-  { icon: Users, label: "Chauffeurs", path: "/drivers" },
-  { icon: Fuel, label: "Carburant", path: "/fuel" },
+  { icon: Home, label: "Overview", path: "/" },
+  { icon: Car, label: "Vehicles", path: "/vehicles" },
+  { icon: Users, label: "Drivers", path: "/drivers" },
+  { icon: Fuel, label: "Fuel", path: "/fuel" },
   { icon: Wrench, label: "Maintenance", path: "/maintenance" },
-  { icon: Box, label: "Modélisation 3D", path: "/cad" },
-  { icon: Settings, label: "Paramètres", path: "/settings" },
+  { icon: Box, label: "3D Modeling", path: "/cad" },
+  { icon: Settings, label: "Settings", path: "/settings" },
 ];
 
 export const Sidebar = () => {

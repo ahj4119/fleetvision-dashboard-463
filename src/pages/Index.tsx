@@ -10,29 +10,29 @@ const Index = () => {
       
       <main className="flex-1 p-8 overflow-auto">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-2xl font-bold text-gray-900 mb-8">Vue d'ensemble</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-8">Overview</h1>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <StatCard
-              title="Véhicules actifs"
+              title="Active Vehicles"
               value="12"
               icon={<Car className="w-5 h-5 text-primary" />}
               trend={{ value: 8, isPositive: true }}
             />
             <StatCard
-              title="Chauffeurs en service"
+              title="Drivers on Duty"
               value="8"
               icon={<Users className="w-5 h-5 text-primary" />}
               trend={{ value: 12, isPositive: true }}
             />
             <StatCard
-              title="Alertes actives"
+              title="Active Alerts"
               value="3"
               icon={<AlertTriangle className="w-5 h-5 text-primary" />}
               trend={{ value: 2, isPositive: false }}
             />
             <StatCard
-              title="Consommation moyenne"
+              title="Average Consumption"
               value="7.2L/100km"
               icon={<Fuel className="w-5 h-5 text-primary" />}
               trend={{ value: 5, isPositive: true }}
@@ -41,9 +41,9 @@ const Index = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="bg-white p-6 rounded-lg shadow-sm">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Carte des véhicules</h2>
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Vehicle Map</h2>
               <div className="bg-gray-100 h-96 rounded flex items-center justify-center">
-                <p className="text-gray-500">Carte à implémenter</p>
+                <p className="text-gray-500">Map to be implemented</p>
               </div>
             </div>
             

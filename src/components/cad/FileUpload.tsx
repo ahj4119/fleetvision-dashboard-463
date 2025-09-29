@@ -50,25 +50,25 @@ export const FileUpload = ({ onFileUpload }: FileUploadProps) => {
             <div className="space-y-2">
               <h3 className="text-lg font-semibold text-gray-900">
                 {isDragActive 
-                  ? 'Déposez votre fichier ici...' 
-                  : 'Téléchargez votre fichier 3DM'
+                  ? 'Drop your file here...' 
+                  : 'Upload your 3DM file'
                 }
               </h3>
               <p className="text-gray-600">
-                Glissez-déposez votre fichier Rhino 3DM ou cliquez pour parcourir
+                Drag and drop your Rhino 3DM file or click to browse
               </p>
             </div>
 
             <Button variant="outline" className="mt-4">
               <Upload className="w-4 h-4 mr-2" />
-              Choisir un fichier
+              Choose File
             </Button>
           </div>
         </div>
 
         <div className="mt-8 text-sm text-gray-500">
-          <p>Formats supportés: .3dm (Rhino 3D)</p>
-          <p>Taille maximale: 50MB</p>
+          <p>Supported formats: .3dm (Rhino 3D)</p>
+          <p>Maximum size: 50MB</p>
         </div>
       </CardContent>
     </Card>

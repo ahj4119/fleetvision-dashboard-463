@@ -60,7 +60,7 @@ const LoadingSpinner = () => (
   <div className="flex items-center justify-center h-full">
     <div className="flex flex-col items-center space-y-4">
       <Loader className="w-8 h-8 animate-spin text-primary" />
-      <p className="text-gray-600">Chargement du modèle 3D...</p>
+      <p className="text-gray-600">Loading 3D model...</p>
     </div>
   </div>
 );
