@@ -36,24 +36,42 @@ const RhinoModel = ({ file }: { file: File }) => {
         setError(null);
         setRhinoObjects([]); // Clear previous objects
         
-        console.log('Starting to parse 3DM file:', file.name, 'Size:', file.size);
+        console.log('=== CADViewer: Starting 3DM file parsing ===');
+        console.log('File name:', file.name);
+        console.log('File size:', file.size, 'bytes');
+        console.log('File type:', file.type);
+        console.log('File last modified:', new Date(file.lastModified));
         
-        // Add some delay to show loading state
-        await new Promise(resolve => setTimeout(resolve, 100));
+        // Check if file is actually a 3DM file
+        if (!file.name.toLowerCase().endsWith('.3dm')) {
+          throw new Error('File is not a .3DM file');
+        }
         
+        console.log('=== Calling rhinoService.parse3dmFile ===');
         const objects = await rhinoService.parse3dmFile(file);
         
-        console.log('Successfully parsed objects:', objects.length);
+        console.log('=== Parsing completed successfully ===');
+        console.log('Number of objects parsed:', objects.length);
         console.log('Objects details:', objects);
+        
+        if (objects.length === 0) {
+          console.warn('No objects found in the 3DM file');
+        }
+        
         setRhinoObjects(objects);
       } catch (err) {
-        console.error('Error parsing 3DM file:', err);
+        console.error('=== CADViewer: Error parsing 3DM file ===');
+        console.error('Error type:', typeof err);
+        console.error('Error message:', err instanceof Error ? err.message : err);
+        console.error('Full error:', err);
         setError(err instanceof Error ? err.message : 'Failed to parse 3DM file');
       } finally {
+        console.log('=== CADViewer: Parsing finished, setting loading to false ===');
         setLoading(false);
       }
     };
 
+    console.log('=== CADViewer: useEffect triggered with new file ===');
     parseRhinoFile();
   }, [file]);
 

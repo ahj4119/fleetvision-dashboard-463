@@ -84,20 +84,38 @@ export class RhinoComputeService {
   }
 
   async parse3dmFile(file: File): Promise<RhinoObject[]> {
-    await this.initialize();
+    console.log('=== RhinoService: parse3dmFile called ===');
+    console.log('File:', file.name, file.size, 'bytes');
+    
+    try {
+      console.log('=== RhinoService: Initializing rhino3dm ===');
+      await this.initialize();
+      console.log('=== RhinoService: Initialization complete ===');
+    } catch (initError) {
+      console.error('=== RhinoService: Initialization failed ===');
+      console.error('Init error:', initError);
+      throw new Error(`Failed to initialize rhino3dm: ${initError instanceof Error ? initError.message : initError}`);
+    }
     
     // Try Rhino Compute first, then fallback to local processing
     try {
+      console.log('=== RhinoService: Trying Rhino Compute ===');
       const objects = await this.parseWithCompute(file);
       if (objects && objects.length > 0) {
-        console.log('Successfully parsed file using Rhino Compute');
+        console.log('=== RhinoService: Successfully parsed with Rhino Compute ===');
+        console.log('Objects found:', objects.length);
         return objects;
+      } else {
+        console.log('=== RhinoService: Rhino Compute returned no objects ===');
       }
     } catch (error) {
-      console.warn('Rhino Compute parsing failed, falling back to local processing:', error);
+      console.warn('=== RhinoService: Rhino Compute parsing failed ===');
+      console.warn('Compute error:', error);
+      console.warn('=== RhinoService: Falling back to local processing ===');
     }
     
     // Fallback to local rhino3dm processing
+    console.log('=== RhinoService: Starting local processing ===');
     return this.parseLocally(file);
   }
 
