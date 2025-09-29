@@ -46,10 +46,11 @@ export class RhinoComputeService {
       let rhino3dm;
       try {
         console.log('=== RhinoService: Importing rhino3dm module ===');
-        const rhinoModule = await import('rhino3dm');
-        rhino3dm = rhinoModule.default;
+        rhino3dm = await import('rhino3dm');
         console.log('=== RhinoService: rhino3dm module imported successfully ===');
-        console.log('Imported rhino3dm type:', typeof rhino3dm);
+        console.log('Imported rhino3dm:', rhino3dm);
+        console.log('Default export type:', typeof rhino3dm.default);
+        console.log('Named exports:', Object.keys(rhino3dm));
       } catch (importError) {
         console.error('=== RhinoService: Failed to import rhino3dm ===', importError);
         throw new Error(`Could not load rhino3dm library: ${importError instanceof Error ? importError.message : importError}`);
@@ -57,15 +58,22 @@ export class RhinoComputeService {
       
       console.log('=== RhinoService: Initializing rhino3dm WASM module ===');
       
-      // Initialize the module - rhino3dm() is the function to call
+      // Initialize the module - use the correct import pattern
       try {
-        if (typeof rhino3dm === 'function') {
-          console.log('=== RhinoService: Calling rhino3dm() function ===');
-          this.rhinoModule = await rhino3dm();
+        let rhinoInitializer;
+        if (typeof rhino3dm.default === 'function') {
+          console.log('=== RhinoService: Using rhino3dm.default() ===');
+          rhinoInitializer = rhino3dm.default;
+        } else if (typeof rhino3dm === 'function') {
+          console.log('=== RhinoService: Using rhino3dm() directly ===');
+          rhinoInitializer = rhino3dm;
         } else {
-          console.error('=== RhinoService: rhino3dm is not a function, type:', typeof rhino3dm);
-          throw new Error('rhino3dm default export is not a function');
+          console.error('=== RhinoService: No valid rhino3dm initializer found ===');
+          throw new Error('Could not find rhino3dm initializer function');
         }
+        
+        console.log('=== RhinoService: Calling rhino3dm initializer ===');
+        this.rhinoModule = await rhinoInitializer();
         console.log('=== RhinoService: rhino3dm WASM module initialized successfully ===');
         console.log('Module type:', typeof this.rhinoModule);
         console.log('Available methods:', Object.keys(this.rhinoModule).slice(0, 10)); // Show first 10 methods
