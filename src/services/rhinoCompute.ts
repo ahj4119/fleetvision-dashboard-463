@@ -16,6 +16,7 @@ export interface RhinoObject {
 
 export class RhinoComputeService {
   private static instance: RhinoComputeService;
+  private computeUrl: string = 'http://localhost:6500'; // Rhino Compute server URL
   private rhinoModule: any = null;
   
   static getInstance(): RhinoComputeService {
@@ -35,6 +36,10 @@ export class RhinoComputeService {
       console.log('Rhino3dm module loaded, initializing...');
       this.rhinoModule = await rhino3dm.default();
       console.log('Rhino3dm initialized successfully');
+      
+      // Test Rhino Compute connection
+      await this.testComputeConnection();
+      
       return this.rhinoModule;
     } catch (error) {
       console.error('Failed to initialize rhino3dm:', error);
@@ -42,9 +47,73 @@ export class RhinoComputeService {
     }
   }
 
+  private async testComputeConnection(): Promise<void> {
+    try {
+      console.log('Testing Rhino Compute connection...');
+      const response = await fetch(`${this.computeUrl}/version`);
+      if (response.ok) {
+        const version = await response.text();
+        console.log('Rhino Compute connected successfully, version:', version);
+      } else {
+        console.warn('Rhino Compute connection test failed, falling back to local processing');
+      }
+    } catch (error) {
+      console.warn('Could not connect to Rhino Compute server, using local processing:', error);
+    }
+  }
+
   async parse3dmFile(file: File): Promise<RhinoObject[]> {
     await this.initialize();
     
+    // Try Rhino Compute first, then fallback to local processing
+    try {
+      const objects = await this.parseWithCompute(file);
+      if (objects && objects.length > 0) {
+        console.log('Successfully parsed file using Rhino Compute');
+        return objects;
+      }
+    } catch (error) {
+      console.warn('Rhino Compute parsing failed, falling back to local processing:', error);
+    }
+    
+    // Fallback to local rhino3dm processing
+    return this.parseLocally(file);
+  }
+
+  private async parseWithCompute(file: File): Promise<RhinoObject[]> {
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    try {
+      console.log('Sending file to Rhino Compute for processing...');
+      const response = await fetch(`${this.computeUrl}/grasshopper`, {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Rhino Compute request failed: ${response.statusText}`);
+      }
+      
+      const result = await response.json();
+      console.log('Rhino Compute response:', result);
+      
+      // Process the compute result and convert to our format
+      return this.processComputeResult(result);
+    } catch (error) {
+      console.error('Rhino Compute API error:', error);
+      throw error;
+    }
+  }
+
+  private processComputeResult(result: any): RhinoObject[] {
+    // This is a placeholder - actual implementation would depend on 
+    // the specific Grasshopper definition and compute response format
+    console.log('Processing Rhino Compute result...');
+    return [];
+  }
+
+  private async parseLocally(file: File): Promise<RhinoObject[]> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       
@@ -53,6 +122,7 @@ export class RhinoComputeService {
           const arrayBuffer = event.target?.result as ArrayBuffer;
           const arr = new Uint8Array(arrayBuffer);
           
+          console.log('Parsing 3DM file locally with rhino3dm...');
           // Parse the 3DM file using rhino3dm
           const doc = this.rhinoModule.File3dm.fromByteArray(arr);
           const objects: RhinoObject[] = [];
@@ -60,6 +130,7 @@ export class RhinoComputeService {
           // Extract objects from the document
           const objectTable = doc.objects();
           const count = objectTable.count;
+          console.log(`Found ${count} objects in 3DM file`);
           
           for (let i = 0; i < count; i++) {
             const rhinoObject = objectTable.get(i);
@@ -79,9 +150,10 @@ export class RhinoComputeService {
           }
           
           doc.delete();
+          console.log(`Successfully extracted ${objects.length} mesh objects`);
           resolve(objects);
         } catch (error) {
-          console.error('Error parsing 3DM file:', error);
+          console.error('Error parsing 3DM file locally:', error);
           reject(error);
         }
       };
