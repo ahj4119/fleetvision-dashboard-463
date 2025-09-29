@@ -4,7 +4,6 @@ import { OrbitControls, PerspectiveCamera, Grid, Environment } from "@react-thre
 import { Mesh, BufferGeometry, Float32BufferAttribute, BufferAttribute, Group } from "three";
 import { Loader } from "lucide-react";
 import { rhinoService, RhinoObject } from "@/services/rhinoCompute";
-import rhino3dm from "rhino3dm";
 
 interface CADViewerProps {
   file: File;
