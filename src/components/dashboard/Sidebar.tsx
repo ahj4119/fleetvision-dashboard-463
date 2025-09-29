@@ -1,4 +1,4 @@
-import { Home, Car, Users, Fuel, Wrench, Settings } from "lucide-react";
+import { Home, Car, Users, Fuel, Wrench, Settings, Box } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const menuItems = [
@@ -7,6 +7,7 @@ const menuItems = [
   { icon: Users, label: "Chauffeurs", path: "/drivers" },
   { icon: Fuel, label: "Carburant", path: "/fuel" },
   { icon: Wrench, label: "Maintenance", path: "/maintenance" },
+  { icon: Box, label: "Modélisation 3D", path: "/cad" },
   { icon: Settings, label: "Paramètres", path: "/settings" },
 ];
 

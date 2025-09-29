@@ -8,6 +8,7 @@ import Vehicles from "./pages/Vehicles";
 import Drivers from "./pages/Drivers";
 import Fuel from "./pages/Fuel";
 import Maintenance from "./pages/Maintenance";
+import CAD from "./pages/CAD";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +25,7 @@ const App = () => (
             <Route path="/drivers" element={<Drivers />} />
             <Route path="/fuel" element={<Fuel />} />
             <Route path="/maintenance" element={<Maintenance />} />
+            <Route path="/cad" element={<CAD />} />
           </Routes>
         </BrowserRouter>
       </div>
