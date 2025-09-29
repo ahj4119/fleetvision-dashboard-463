@@ -46,8 +46,10 @@ export class RhinoComputeService {
       let rhino3dm;
       try {
         console.log('=== RhinoService: Importing rhino3dm module ===');
-        rhino3dm = await import('rhino3dm');
+        const rhinoModule = await import('rhino3dm');
+        rhino3dm = rhinoModule.default;
         console.log('=== RhinoService: rhino3dm module imported successfully ===');
+        console.log('Imported rhino3dm type:', typeof rhino3dm);
       } catch (importError) {
         console.error('=== RhinoService: Failed to import rhino3dm ===', importError);
         throw new Error(`Could not load rhino3dm library: ${importError instanceof Error ? importError.message : importError}`);
@@ -55,12 +57,18 @@ export class RhinoComputeService {
       
       console.log('=== RhinoService: Initializing rhino3dm WASM module ===');
       
-      // Initialize the module
+      // Initialize the module - rhino3dm() is the function to call
       try {
-        this.rhinoModule = await rhino3dm.default();
+        if (typeof rhino3dm === 'function') {
+          console.log('=== RhinoService: Calling rhino3dm() function ===');
+          this.rhinoModule = await rhino3dm();
+        } else {
+          console.error('=== RhinoService: rhino3dm is not a function, type:', typeof rhino3dm);
+          throw new Error('rhino3dm default export is not a function');
+        }
         console.log('=== RhinoService: rhino3dm WASM module initialized successfully ===');
         console.log('Module type:', typeof this.rhinoModule);
-        console.log('Available methods:', Object.keys(this.rhinoModule));
+        console.log('Available methods:', Object.keys(this.rhinoModule).slice(0, 10)); // Show first 10 methods
       } catch (initError) {
         console.error('=== RhinoService: Failed to initialize rhino3dm WASM ===', initError);
         throw new Error(`Failed to initialize rhino3dm WASM: ${initError instanceof Error ? initError.message : initError}`);
