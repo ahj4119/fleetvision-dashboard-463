@@ -29,14 +29,16 @@ export class RhinoComputeService {
     if (this.rhinoModule) return this.rhinoModule;
     
     try {
+      console.log('Initializing rhino3dm library...');
       // Load rhino3dm library
       const rhino3dm = await import('rhino3dm');
+      console.log('Rhino3dm module loaded, initializing...');
       this.rhinoModule = await rhino3dm.default();
       console.log('Rhino3dm initialized successfully');
       return this.rhinoModule;
     } catch (error) {
       console.error('Failed to initialize rhino3dm:', error);
-      throw error;
+      throw new Error(`Rhino3dm initialization failed: ${error}`);
     }
   }
 

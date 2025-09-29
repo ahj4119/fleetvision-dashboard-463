@@ -34,11 +34,17 @@ const RhinoModel = ({ file }: { file: File }) => {
       try {
         setLoading(true);
         setError(null);
+        setRhinoObjects([]); // Clear previous objects
         
-        console.log('Parsing 3DM file:', file.name);
+        console.log('Starting to parse 3DM file:', file.name, 'Size:', file.size);
+        
+        // Add some delay to show loading state
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
         const objects = await rhinoService.parse3dmFile(file);
         
-        console.log('Parsed objects:', objects.length);
+        console.log('Successfully parsed objects:', objects.length);
+        console.log('Objects details:', objects);
         setRhinoObjects(objects);
       } catch (err) {
         console.error('Error parsing 3DM file:', err);
