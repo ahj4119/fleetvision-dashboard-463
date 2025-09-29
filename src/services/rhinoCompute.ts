@@ -31,10 +31,31 @@ export class RhinoComputeService {
     
     try {
       console.log('Initializing rhino3dm library...');
-      // Load rhino3dm library
-      const rhino3dm = await import('rhino3dm');
+      
+      // Check if we're in a browser environment
+      if (typeof window === 'undefined') {
+        throw new Error('rhino3dm requires a browser environment');
+      }
+      
+      // Load rhino3dm library with better error handling
+      let rhino3dm;
+      try {
+        rhino3dm = await import('rhino3dm');
+      } catch (importError) {
+        console.error('Failed to import rhino3dm:', importError);
+        throw new Error('Could not load rhino3dm library. Please check if the library is properly installed.');
+      }
+      
       console.log('Rhino3dm module loaded, initializing...');
-      this.rhinoModule = await rhino3dm.default();
+      
+      // Initialize the module
+      try {
+        this.rhinoModule = await rhino3dm.default();
+      } catch (initError) {
+        console.error('Failed to initialize rhino3dm:', initError);
+        throw new Error('Failed to initialize rhino3dm. This may be due to WebAssembly support issues.');
+      }
+      
       console.log('Rhino3dm initialized successfully');
       
       // Test Rhino Compute connection
@@ -43,7 +64,7 @@ export class RhinoComputeService {
       return this.rhinoModule;
     } catch (error) {
       console.error('Failed to initialize rhino3dm:', error);
-      throw new Error(`Rhino3dm initialization failed: ${error}`);
+      throw new Error(`Rhino3dm initialization failed: ${error instanceof Error ? error.message : error}`);
     }
   }
 
