@@ -27,59 +27,80 @@ export class RhinoComputeService {
   }
 
   async initialize() {
-    if (this.rhinoModule) return this.rhinoModule;
+    if (this.rhinoModule) {
+      console.log('=== RhinoService: rhino3dm already initialized ===');
+      return this.rhinoModule;
+    }
     
     try {
-      console.log('Initializing rhino3dm library...');
+      console.log('=== RhinoService: Starting rhino3dm initialization ===');
       
       // Check if we're in a browser environment
       if (typeof window === 'undefined') {
         throw new Error('rhino3dm requires a browser environment');
       }
       
+      console.log('=== RhinoService: Browser environment confirmed ===');
+      
       // Load rhino3dm library with better error handling
       let rhino3dm;
       try {
+        console.log('=== RhinoService: Importing rhino3dm module ===');
         rhino3dm = await import('rhino3dm');
+        console.log('=== RhinoService: rhino3dm module imported successfully ===');
       } catch (importError) {
-        console.error('Failed to import rhino3dm:', importError);
-        throw new Error('Could not load rhino3dm library. Please check if the library is properly installed.');
+        console.error('=== RhinoService: Failed to import rhino3dm ===', importError);
+        throw new Error(`Could not load rhino3dm library: ${importError instanceof Error ? importError.message : importError}`);
       }
       
-      console.log('Rhino3dm module loaded, initializing...');
+      console.log('=== RhinoService: Initializing rhino3dm WASM module ===');
       
       // Initialize the module
       try {
         this.rhinoModule = await rhino3dm.default();
+        console.log('=== RhinoService: rhino3dm WASM module initialized successfully ===');
+        console.log('Module type:', typeof this.rhinoModule);
+        console.log('Available methods:', Object.keys(this.rhinoModule));
       } catch (initError) {
-        console.error('Failed to initialize rhino3dm:', initError);
-        throw new Error('Failed to initialize rhino3dm. This may be due to WebAssembly support issues.');
+        console.error('=== RhinoService: Failed to initialize rhino3dm WASM ===', initError);
+        throw new Error(`Failed to initialize rhino3dm WASM: ${initError instanceof Error ? initError.message : initError}`);
       }
       
-      console.log('Rhino3dm initialized successfully');
+      console.log('=== RhinoService: Testing Rhino Compute connection ===');
       
       // Test Rhino Compute connection
       await this.testComputeConnection();
       
       return this.rhinoModule;
     } catch (error) {
-      console.error('Failed to initialize rhino3dm:', error);
+      console.error('=== RhinoService: rhino3dm initialization failed ===', error);
       throw new Error(`Rhino3dm initialization failed: ${error instanceof Error ? error.message : error}`);
     }
   }
 
   private async testComputeConnection(): Promise<void> {
     try {
-      console.log('Testing Rhino Compute connection...');
-      const response = await fetch(`${this.computeUrl}/version`);
+      console.log('=== RhinoService: Testing Rhino Compute connection to', this.computeUrl, '===');
+      const response = await fetch(`${this.computeUrl}/version`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'text/plain'
+        }
+      });
+      
+      console.log('=== RhinoService: Compute response status:', response.status, response.statusText, '===');
+      
       if (response.ok) {
         const version = await response.text();
-        console.log('Rhino Compute connected successfully, version:', version);
+        console.log('=== RhinoService: Rhino Compute connected successfully, version:', version, '===');
       } else {
-        console.warn('Rhino Compute connection test failed, falling back to local processing');
+        console.warn('=== RhinoService: Rhino Compute connection test failed, status:', response.status, '===');
+        console.warn('=== RhinoService: Will fall back to local processing ===');
       }
     } catch (error) {
-      console.warn('Could not connect to Rhino Compute server, using local processing:', error);
+      console.warn('=== RhinoService: Could not connect to Rhino Compute server ===');
+      console.warn('Error:', error);
+      console.warn('=== RhinoService: Will use local processing only ===');
     }
   }
 

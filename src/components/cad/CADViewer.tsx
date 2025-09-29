@@ -76,8 +76,10 @@ const RhinoModel = ({ file }: { file: File }) => {
   }, [file]);
 
   if (loading) {
+    console.log('=== CADViewer: Rendering LOADING state ===');
     return (
       <group>
+        {/* Loading indicator - thin flat rectangle */}
         <mesh position={[0, 0, 0]}>
           <boxGeometry args={[2, 0.1, 2]} />
           <meshStandardMaterial color="#888888" wireframe />
@@ -87,8 +89,10 @@ const RhinoModel = ({ file }: { file: File }) => {
   }
 
   if (error) {
+    console.log('=== CADViewer: Rendering ERROR state ===', error);
     return (
       <group>
+        {/* Error indicator - tall red rectangle */}
         <mesh position={[0, 0, 0]}>
           <boxGeometry args={[4, 2, 0.1]} />
           <meshStandardMaterial color="#ff4444" />
@@ -98,8 +102,10 @@ const RhinoModel = ({ file }: { file: File }) => {
   }
 
   if (rhinoObjects.length === 0) {
+    console.log('=== CADViewer: Rendering EMPTY state - No objects found ===');
     return (
       <group>
+        {/* Empty state - cube wireframe */}
         <mesh position={[0, 0, 0]}>
           <boxGeometry args={[2, 2, 2]} />
           <meshStandardMaterial color="#cccccc" wireframe />
@@ -108,6 +114,8 @@ const RhinoModel = ({ file }: { file: File }) => {
     );
   }
 
+  console.log('=== CADViewer: Rendering SUCCESSFUL state with', rhinoObjects.length, 'objects ===');
+  
   return (
     <group ref={groupRef}>
       {rhinoObjects.map((rhinoObj, index) => {
